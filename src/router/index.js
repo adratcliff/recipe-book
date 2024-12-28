@@ -3,7 +3,7 @@ import { createRouter, createWebHashHistory } from 'vue-router';
 const routes = [
   {
     path: '/',
-    name: 'recipe-list',
+    name: 'recipe-book',
     component: () => import(/* webpackChunkName: "recipe-book" */ '../views/RecipeList.vue')
   },
   {
