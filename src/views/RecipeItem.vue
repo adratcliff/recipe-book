@@ -1,6 +1,9 @@
 <template>
   <v-container>
-    <v-card>
+    <v-card v-if="!!recipeLoading">
+      <v-skeleton-loader type="image, heading, chip@3, list-item-three-line, ossein" />
+    </v-card>
+    <v-card v-if="!recipeLoading">
       <v-card-title>{{ recipe.name }}</v-card-title>
       <v-card-text>{{ recipe }}</v-card-text>
     </v-card>
@@ -14,45 +17,13 @@ import { storeToRefs } from 'pinia';
 
 import { useRecipeStore } from '../stores';
 
-// eslint-disable-next-line no-unused-vars
-const details = {
-  id1: {
-    id: 'id1',
-    name: 'brownie',
-    tags: ['desert', 'chocolate', 'mint'],
-    created: '2024-10-10T20:10:00.000Z',
-    updated: '2024-10-20T10:10:00.000Z',
-    times: {
-      prep: { duration: 15, unit: 'minute' },
-      cook: { duration: 20, unit: 'minute' },
-    },
-    difficulty: 1,
-    satisfaction: 5,
-    recipe: [
-      {
-        section: 'base',
-        ingredients: [
-          { item: 'egg', quantity: 2, unit: '' },
-          { item: 'sugar', quantity: 2, unit: 'tablespoon' },
-          { item: 'flour', quantity: 1, unit: 'cup' },
-        ],
-        tools: [
-          'Pot',
-        ],
-        instructions: [
-          'Crack egg in pot',
-          'Add sugar to pot',
-        ],
-      }
-    ]
-  },
-};
-
 const route = useRoute();
 const recipeStore = useRecipeStore();
-const { item: getRecipe } = storeToRefs(recipeStore);
+const { item: getRecipe, itemLoading: getRecipeLoading } = storeToRefs(recipeStore);
 
 const recipe = computed(() => getRecipe.value(route.params.id));
+const recipeLoading = computed(() => getRecipeLoading.value(route.params.id));
+
 
 onMounted(async () => {
   try {

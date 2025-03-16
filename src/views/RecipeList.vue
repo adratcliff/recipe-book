@@ -1,6 +1,16 @@
 <template>
   <v-container fluid>
-    <v-row>
+    <v-row v-if="!!recipeLoaders.list">
+      <v-col
+        v-for="loaderIdx in 12"
+        :key="`recipe-loader-${loaderIdx}`"
+        lg="4"
+        md="6"
+        cols="12">
+        <v-skeleton-loader type="image, heading, chip@3" />
+      </v-col>
+    </v-row>
+    <v-row v-if="!recipeLoaders.list">
       <v-col
         v-for="recipe in recipeList"
         :key="`recipe-${recipe.id}`"
@@ -34,22 +44,8 @@ import { storeToRefs } from 'pinia';
 
 import { useRecipeStore } from '../stores';
 
-// eslint-disable-next-line no-unused-vars
-const list = {
-  id1: {
-    id: 'id1',
-    name: 'brownie',
-    tags: ['desert', 'chocolate', 'mint'],
-  },
-  id2: {
-    id: 'id2',
-    name: 'parmi',
-    tags: ['dinner', 'chicken'],
-  },
-};
-
 const recipeStore = useRecipeStore();
-const { list: recipeList } = storeToRefs(recipeStore);
+const { list: recipeList, loaders: recipeLoaders } = storeToRefs(recipeStore);
 
 onMounted(async () => {
   await recipeStore.getList();
