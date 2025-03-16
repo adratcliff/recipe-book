@@ -15,6 +15,7 @@
   "main": "dist/recipe-book.umd.js",
   "module": "dist/recipe-book.umd.js",
   "dependencies": {
+    "pinia": "^3.0.1"
   },
   "peerDependencies": {
     "@mdi/font": "5.9.55",

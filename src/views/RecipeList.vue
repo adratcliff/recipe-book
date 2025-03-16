@@ -28,7 +28,13 @@
   </v-container>
 </template>
 
-<script>
+<script setup>
+import { onMounted } from 'vue';
+import { storeToRefs } from 'pinia';
+
+import { useRecipeStore } from '../stores';
+
+// eslint-disable-next-line no-unused-vars
 const list = {
   id1: {
     id: 'id1',
@@ -42,12 +48,10 @@ const list = {
   },
 };
 
-export default {
-  name: 'RecipeBook',
-  setup() {
-    return {
-      recipeList: list,
-    };
-  },
-};
+const recipeStore = useRecipeStore();
+const { list: recipeList } = storeToRefs(recipeStore);
+
+onMounted(async () => {
+  await recipeStore.getList();
+});
 </script>

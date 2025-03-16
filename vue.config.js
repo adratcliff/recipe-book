@@ -1,4 +1,6 @@
 const { defineConfig } = require('@vue/cli-service');
+const path = require('path');
+
 module.exports = defineConfig({
   transpileDependencies: true,
   pluginOptions: {
@@ -7,10 +9,16 @@ module.exports = defineConfig({
 		},
   },
   configureWebpack: {
+    resolve: {
+      alias: {
+        '@': path.resolve('../web-adratcliff/src'),
+      },
+    },
     externals: [
       'vue',
       'vuetify',
       'vue-router',
+      'pinia',
       '@mdi/font',
       'core-js',
       'register-service-worker',

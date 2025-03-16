@@ -7,10 +7,14 @@
   </v-container>
 </template>
 
-<script>
-import { onBeforeMount } from 'vue';
+<script setup>
+import { computed, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
+import { storeToRefs } from 'pinia';
 
+import { useRecipeStore } from '../stores';
+
+// eslint-disable-next-line no-unused-vars
 const details = {
   id1: {
     id: 'id1',
@@ -28,9 +32,9 @@ const details = {
       {
         section: 'base',
         ingredients: [
-          { item: 'egg', quantity: 2, quantityType: '' },
-          { item: 'sugar', quantity: 2, quantityType: 'tablespoon' },
-          { item: 'flour', quantity: 1, quantityType: 'cup' },
+          { item: 'egg', quantity: 2, unit: '' },
+          { item: 'sugar', quantity: 2, unit: 'tablespoon' },
+          { item: 'flour', quantity: 1, unit: 'cup' },
         ],
         tools: [
           'Pot',
@@ -44,19 +48,18 @@ const details = {
   },
 };
 
-export default {
-  name: 'RecipeItem',
-  setup() {
-    const route = useRoute();
+const route = useRoute();
+const recipeStore = useRecipeStore();
+const { item: getRecipe } = storeToRefs(recipeStore);
 
-    onBeforeMount(() => {
-      if (route.params.id in details) return;
-      useRouter().push({ name: 'recipe-book' });
-    });
+const recipe = computed(() => getRecipe.value(route.params.id));
 
-    return {
-      recipe: details[route.params.id] || {},
-    };
-  },
-};
+onMounted(async () => {
+  try {
+    await recipeStore.getDetail(route.params.id);
+  } catch (err) {
+    console.warn(`Failed to load recipe ${route.params.id}`, err);
+    useRouter().push({ name: 'recipe-book' });
+  }
+});
 </script>
