@@ -24,13 +24,18 @@
             <span class="text-subtitle-2 text-grey">15 m</span>
           </v-card-title>
           <v-card-text>
-            <v-chip
-              v-for="(tag, tagIdx) in recipe.tags"
-              :key="`recipe-${recipe.id}-tag-${tagIdx}`"
-              :text="tag"
-              class="mr-1 mt-1"
-              size="small"
-              label />
+            <v-row class="d-flex align-center">
+              <v-col cols="12">
+                <v-chip
+                  v-for="(tag, tagIdx) in recipe.tags"
+                  :key="`recipe-${recipe.id}-tag-${tagIdx}`"
+                  :text="capitalise(tag)"
+                  :color="tagColor(tag)"
+                  class="mr-1 mt-1"
+                  variant="flat"
+                  size="small" />
+              </v-col>
+            </v-row>
           </v-card-text>
         </v-card>
       </v-col>
@@ -41,6 +46,8 @@
 <script setup>
 import { onMounted } from 'vue';
 import { storeToRefs } from 'pinia';
+
+import { capitalise, tagColor } from '@/utils';
 
 import { useRecipeStore } from '../stores';
 
