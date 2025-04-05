@@ -164,7 +164,7 @@ import { computed, onMounted, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { storeToRefs } from 'pinia';
 
-import { capitalise, tagColor } from '@/utils';
+import { capitalise, decimalToFraction, tagColor } from '@/utils';
 
 import { useRecipeStore } from '../stores';
 
@@ -201,7 +201,7 @@ const tools = computed(() => {
 const ingredientsCombined = ref(false);
 
 const ingredientDescription = ({ item, quantity, unit }) => {
-  let str = `${quantity} `;
+  let str = `${decimalToFraction(quantity, true)} `;
   if (unit) {
     str += unit;
     if (quantity > 1) str += 's';
