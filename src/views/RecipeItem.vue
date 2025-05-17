@@ -54,9 +54,7 @@
                       :key="`recipe-tag-${tagIdx}`"
                       :text="capitalise(tag)"
                       :color="tagColor(tag)"
-                      class="mr-1 mt-1"
-                      variant="flat"
-                      size="small" />
+                      class="mr-1 mt-1" />
                   </v-col>
                 </v-row>
                 <v-row v-if="recipe.description">
@@ -164,11 +162,17 @@ import { computed, onMounted, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { storeToRefs } from 'pinia';
 
-import { capitalise, decimalToFraction, tagColor } from '@/utils';
+import {
+  capitalise,
+  decimalToFraction,
+  handleError,
+  tagColor,
+} from '@/utils';
 
 import { useRecipeStore } from '../stores';
 
 const route = useRoute();
+const router = useRouter();
 const recipeStore = useRecipeStore();
 const { item: getRecipe, itemLoading: getRecipeLoading } = storeToRefs(recipeStore);
 
@@ -244,9 +248,12 @@ const ingredients = computed(() => {
 onMounted(async () => {
   try {
     await recipeStore.getDetail(route.params.id);
+    if (!recipe.value.id) {
+      return router.push({ name: 'recipe-book' });
+    }
   } catch (err) {
-    console.warn(`Failed to load recipe ${route.params.id}`, err);
-    useRouter().push({ name: 'recipe-book' });
+    handleError(`Failed to load recipe ${route.params.id}`, err);
+    router.push({ name: 'recipe-book' });
   }
 });
 </script>
