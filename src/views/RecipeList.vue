@@ -11,6 +11,18 @@
       </v-col>
     </v-row>
     <v-row v-if="!recipeLoaders.list">
+      <v-col cols="12" class="d-flex">
+        <v-spacer />
+        <v-btn
+          v-if="user.id"
+          text="Recipe"
+          prepend-icon="mdi-plus"
+          variant="outlined"
+          color="primary"
+          to="/recipes/create" />
+      </v-col>
+    </v-row>
+    <v-row v-if="!recipeLoaders.list">
       <v-col
         v-for="recipe in recipeList"
         :key="`recipe-${recipe.id}`"
@@ -31,9 +43,7 @@
                   :key="`recipe-${recipe.id}-tag-${tagIdx}`"
                   :text="capitalise(tag)"
                   :color="tagColor(tag)"
-                  class="mr-1 mt-1"
-                  variant="flat"
-                  size="small" />
+                  class="mr-1 mt-1" />
               </v-col>
             </v-row>
           </v-card-text>
@@ -49,7 +59,12 @@ import { storeToRefs } from 'pinia';
 
 import { capitalise, tagColor } from '@/utils';
 
+import { useUserStore } from '@/stores/users';
 import { useRecipeStore } from '../stores';
+
+const userStore = useUserStore();
+
+const { self: user } = storeToRefs(userStore);
 
 const recipeStore = useRecipeStore();
 const { list: recipeList, loaders: recipeLoaders } = storeToRefs(recipeStore);
