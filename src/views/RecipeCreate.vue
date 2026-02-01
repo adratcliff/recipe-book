@@ -233,7 +233,7 @@ import {
   handleError,
   randomHex,
   tagColor,
-} from '@/utils';
+} from 'shared/utils';
 
 import { useRecipeStore } from '../stores';
 

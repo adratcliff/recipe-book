@@ -57,9 +57,9 @@
 import { onMounted } from 'vue';
 import { storeToRefs } from 'pinia';
 
-import { capitalise, tagColor } from '@/utils';
+import { capitalise, tagColor } from 'shared/utils';
+import { useUserStore } from 'shared/stores';
 
-import { useUserStore } from '@/stores/users';
 import { useRecipeStore } from '../stores';
 
 const userStore = useUserStore();

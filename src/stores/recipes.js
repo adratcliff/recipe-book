@@ -1,3 +1,3 @@
-import { createStore } from '@/utils/stores.js';
+import { createStore } from 'shared/utils';
 
 export const useRecipeStore = createStore('recipes');

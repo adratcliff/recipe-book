@@ -167,7 +167,7 @@ import {
   decimalToFraction,
   handleError,
   tagColor,
-} from '@/utils';
+} from 'shared/utils';
 
 import { useRecipeStore } from '../stores';
 
@@ -176,6 +176,7 @@ const router = useRouter();
 const recipeStore = useRecipeStore();
 const { item: getRecipe, itemLoading: getRecipeLoading } = storeToRefs(recipeStore);
 
+console.log(route)
 const recipe = computed(() => getRecipe.value(route.params.id));
 const recipeLoading = computed(() => getRecipeLoading.value(route.params.id));
 
