@@ -49,6 +49,9 @@
           </v-card-text>
         </v-card>
       </v-col>
+      <v-col v-if="!recipeList.length" cols="12">
+        Could Not Load Any Recipes
+      </v-col>
     </v-row>
   </v-container>
 </template>
