@@ -1,224 +1,155 @@
 <template>
-  <v-container fluid>
-    <v-card>
-      <v-card-title>
-        <v-row>
-          <v-col cols="9" md="6">
-            <v-text-field
-              v-model="name"
-              label="Recipe Name"
-              hide-details />
-          </v-col>
-          <v-col cols="3" md="6" class="d-flex">
-            <v-spacer />
-            <v-btn
-              text="Create"
-              variant="outlined"
-              color="primary"
-              height="40"
-              @click="createRecipe" />
-          </v-col>
-        </v-row>
-        <v-row>
-          <v-col md="6">
-            <div class="text-body-1 text-grey-lighten-1">Satisfaction</div>
-            <v-rating
-              label="Satisfcation"
-              v-model="satisfaction"
-              :length="5"
-              active-color="primary"
-              density="compact"
-              half-increments
-              hover />
-          </v-col>
-          <v-col md="6">
-            <div class="text-body-1 text-grey-lighten-1">Difficulty</div>
-            <v-rating
-              v-model="difficulty"
-              :length="5"
-              active-color="primary"
-              density="compact"
-              half-increments
-              hover />
-          </v-col>
-        </v-row>
-        <v-row>
-          <v-col>
-            <v-textarea
-              v-model="description"
-              label="Description"
-              hide-details />
-          </v-col>
-        </v-row>
-        <v-row>
-          <v-col>
-            <v-combobox
-              v-model="tags"
-              :items="existingTags"
-              :loading="!!recipeLoaders.list"
-              label="Tags"
-              multiple
-              chips>
-              <template #chip="{ item }">
-                <v-chip
-                  :text="capitalise(item.value)"
-                  :color="tagColor(item.value.toLowerCase())" />
-              </template>
-            </v-combobox>
-          </v-col>
-        </v-row>
-      </v-card-title>
-      <v-card-text
-        v-for="(section, sIdx) in sections"
-        :key="`section-input-${section.id}`"
-        class="py-4">
-        <v-row>
-          <v-divider />
-          <v-col cols="10" md="6">
-            <v-text-field
-              v-model="section.name"
-              label="Name"
-              hide-details />
-          </v-col>
-          <v-col cols="2" md="6" class="d-flex">
-            <v-spacer />
-            <v-btn
-              :disabled="sections.length < 2"
-              icon="mdi-delete"
-              variant="outlined"
-              color="error"
-              size="small"
-              @click="removeSection(section.id)" />
-          </v-col>
-        </v-row>
-        <div v-if="section.name">
-          <v-row
-            v-for="(tool, tIdx) in section.tools"
-            :key="`section-${section.id}-tool-${tIdx}`">
-            <v-col cols="12" md="4" class="d-flex justify-space-between">
-              <v-row>
-                <v-col>
-                  <v-text-field
-                    v-model="section.tools[tIdx]"
-                    ref="sectionTools"
-                    label="Tool"
-                    hide-details />
-                </v-col>
-                <div class="d-flex align-center">
-                  <v-btn
-                    icon="mdi-plus"
-                    variant="outlined"
-                    color="primary"
-                    size="x-small"
-                    @click="addSectionElement('tools', sIdx, tIdx)" />
-                  <v-btn
-                    :disabled="section.tools.length < 2"
-                    icon="mdi-delete"
-                    variant="outlined"
-                    color="error"
-                    size="x-small"
-                    class="mx-2"
-                    @click="removeSectionElement('tools', sIdx, tIdx)" />
-                </div>
-              </v-row>
-            </v-col>
-          </v-row>
-          <v-row
-            v-for="(ingredient, iIdx) in section.ingredients"
-            :key="`section-${section.id}-ingredient-${iIdx}`">
-            <v-col cols="12" md="8" class="d-flex justify-space-between">
-              <v-row>
-                <v-col>
-                  <v-text-field
-                    v-model="section.ingredients[iIdx].quantity"
-                    ref="sectionIngredientQuantities"
-                    label="Quantity"
-                    type="number"
-                    min="0"
-                    hide-details />
-                </v-col>
-                <v-col>
-                  <v-text-field
-                    v-model="section.ingredients[iIdx].unit"
-                    ref="sectionIngredientUnits"
-                    label="Unit"
-                    hide-details />
-                </v-col>
-                <v-col>
-                  <v-text-field
-                    v-model="section.ingredients[iIdx].item"
-                    ref="sectionIngredientItems"
-                    label="Item"
-                    hide-details />
-                </v-col>
-                <div class="d-flex align-center">
-                  <v-btn
-                    icon="mdi-plus"
-                    variant="outlined"
-                    color="primary"
-                    size="x-small"
-                    @click="addSectionElement('ingredients', sIdx, iIdx)" />
-                  <v-btn
-                    :disabled="section.ingredients.length < 2"
-                    icon="mdi-delete"
-                    variant="outlined"
-                    color="error"
-                    size="x-small"
-                    class="mx-2"
-                    @click="removeSectionElement('ingredients', sIdx, iIdx)" />
-                </div>
-              </v-row>
-            </v-col>
-          </v-row>
-          <v-row
-            v-for="(instructions, iIdx) in section.instructions"
-            :key="`section-${section.id}-instruction-${iIdx}`">
-            <v-col cols="12" class="d-flex justify-space-between">
-              <v-row>
-                <v-col>
-                  <v-textarea
-                    v-model="section.instructions[iIdx]"
-                    ref="sectionInstructions"
-                    label="Instruction"
-                    rows="1"
-                    auto-grow
-                    hide-details />
-                </v-col>
-                <div class="mt-4">
-                  <v-btn
-                    icon="mdi-plus"
-                    variant="outlined"
-                    color="primary"
-                    size="x-small"
-                    @click="addSectionElement('instructions', sIdx, iIdx)" />
-                  <v-btn
-                    :disabled="section.instructions.length < 2"
-                    icon="mdi-delete"
-                    variant="outlined"
-                    color="error"
-                    size="x-small"
-                    class="mx-2"
-                    @click="removeSectionElement('instructions', sIdx, iIdx)" />
-                </div>
-              </v-row>
-            </v-col>
-          </v-row>
+  <v-container class="max-width-container py-8">
+    <v-form @submit.prevent="createRecipe">
+
+      <div class="d-flex align-center mb-6">
+        <div>
+          <h1 class="text-h4 font-weight-bold">Create New Recipe</h1>
+          <p class="text-subtitle-1 text-medium-emphasis">Fill in the details below to share your masterpiece.</p>
         </div>
-      </v-card-text>
-      <v-card-actions>
-        <v-row class="text-center">
-          <v-divider />
-          <v-col>
+        <v-spacer />
+        <v-btn
+          color="primary"
+          size="large"
+          rounded="lg"
+          elevation="2"
+          prepend-icon="mdi-check"
+          @click="createRecipe"
+        >
+          Create Recipe
+        </v-btn>
+      </div>
+
+      <v-card border flat class="mb-6 rounded-xl pa-4">
+        <v-card-title class="text-h6 pb-4">General Information</v-card-title>
+        <v-card-text>
+          <v-row>
+            <v-col cols="12" md="8">
+              <v-text-field
+                v-model="name"
+                label="Recipe Name"
+                placeholder="e.g., Grandma's Secret Pasta"
+                variant="outlined"
+              />
+            </v-col>
+            <v-col cols="6" md="2">
+              <div class="text-caption text-grey mb-1">Satisfaction</div>
+              <v-rating v-model="satisfaction" density="compact" color="amber" half-increments hover />
+            </v-col>
+            <v-col cols="6" md="2">
+              <div class="text-caption text-grey mb-1">Difficulty</div>
+              <v-rating v-model="difficulty" density="compact" color="red-lighten-1" half-increments hover />
+            </v-col>
+            <v-col cols="12">
+              <v-textarea v-model="description" label="Short Description" variant="outlined" rows="2" auto-grow />
+            </v-col>
+            <v-col cols="12">
+              <v-combobox
+                v-model="tags"
+                :items="existingTags"
+                label="Tags"
+                multiple
+                chips
+                variant="outlined"
+                closable-chips
+              >
+                <template #chip="{ item, props }">
+                  <v-chip v-bind="props" :text="capitalise(item.value)" :color="tagColor(item.value.toLowerCase())" variant="flat" />
+                </template>
+              </v-combobox>
+            </v-col>
+          </v-row>
+        </v-card-text>
+      </v-card>
+
+      <div v-for="(section, sIdx) in sections" :key="section.id" class="mb-8">
+        <v-card border flat class="rounded-xl overflow-hidden">
+          <v-toolbar flat>
+            <v-toolbar-title>
+              <v-text-field
+                v-model="section.name"
+                placeholder="Section Name (e.g., The Dough)"
+                variant="plain"
+                hide-details
+                class="font-weight-bold"
+              />
+            </v-toolbar-title>
+            <v-spacer />
             <v-btn
-              prepend-icon="mdi-plus"
-              text="Add Section"
-              variant="outlined"
-              color="primary"
-              @click="addSection" />
-          </v-col>
-        </v-row>
-      </v-card-actions>
-    </v-card>
+              v-if="sections.length > 1"
+              icon="mdi-delete-outline"
+              color="error"
+              variant="text"
+              @click="removeSection(section.id)"
+            />
+          </v-toolbar>
+
+          <v-row no-gutters>
+            <v-col cols="12" md="5" class="border-e pa-4">
+              <div class="text-overline mb-4 text-primary">Ingredients & Tools</div>
+
+              <div v-for="(tool, tIdx) in section.tools" :key="tIdx" class="d-flex ga-2 mb-2">
+                <v-text-field
+                  v-model="section.tools[tIdx]"
+                  label="Tool"
+                  variant="solo"
+                  density="compact"
+                  flat
+                  hide-details
+                  prepend-inner-icon="mdi-wrench"
+                />
+                <v-btn icon="mdi-plus" variant="text" size="small" @click="addSectionElement('tools', sIdx, tIdx)" />
+                <v-btn :disabled="section.tools.length < 2" icon="mdi-minus" variant="text" size="small" color="error" @click="removeSectionElement('tools', sIdx, tIdx)" />
+              </div>
+
+              <v-divider class="my-4" />
+
+              <div v-for="(ing, iIdx) in section.ingredients" :key="iIdx" class="d-flex ga-1 mb-2 align-center">
+                <v-text-field v-model="ing.quantity" label="Qty" variant="solo" density="compact" flat hide-details style="width: 60px" />
+                <v-text-field v-model="ing.unit" label="Unit" variant="solo" density="compact" flat hide-details style="width: 80px" />
+                <v-text-field v-model="ing.item" label="Item" variant="solo" density="compact" flat hide-details />
+                <v-btn icon="mdi-plus" variant="text" size="small" @click="addSectionElement('ingredients', sIdx, iIdx)" />
+                <v-btn :disabled="section.ingredients.length < 2" icon="mdi-minus" variant="text" size="small" color="error" @click="removeSectionElement('ingredients', sIdx, iIdx)" />
+              </div>
+            </v-col>
+
+            <v-col cols="12" md="7" class="pa-4">
+              <div class="text-overline mb-4 text-primary">Instructions</div>
+              <div v-for="(inst, instIdx) in section.instructions" :key="instIdx" class="d-flex ga-3 mb-4">
+                <v-avatar color="primary" size="24" class="mt-3 text-caption">{{ instIdx + 1 }}</v-avatar>
+                <v-textarea
+                  v-model="section.instructions[instIdx]"
+                  variant="outlined"
+                  density="compact"
+                  rows="1"
+                  auto-grow
+                  hide-details
+                  placeholder="What's the next step?"
+                />
+                <div class="d-flex flex-column">
+                  <v-btn icon="mdi-plus" variant="text" size="small" @click="addSectionElement('instructions', sIdx, instIdx)" />
+                  <v-btn :disabled="section.instructions.length < 2" icon="mdi-minus" variant="text" size="small" color="error" @click="removeSectionElement('instructions', sIdx, instIdx)" />
+                </div>
+              </div>
+            </v-col>
+          </v-row>
+        </v-card>
+      </div>
+
+      <v-btn
+        block
+        variant="dashed"
+        border
+        height="80"
+        color="primary"
+        class="rounded-xl mb-12"
+        prepend-icon="mdi-plus-circle"
+        @click="addSection"
+      >
+        Add Another Section (e.g. Frosting, Garnish)
+      </v-btn>
+
+    </v-form>
   </v-container>
 </template>
 
@@ -348,3 +279,14 @@ onMounted(async () => {
   await recipeStore.getList();
 });
 </script>
+
+<style scoped>
+.max-width-container {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+/* Creating a "dashed" button style for the Add Section button */
+.v-btn--variant-dashed {
+  border: 2px dashed currentColor !important;
+}
+</style>
