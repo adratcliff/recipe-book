@@ -40,10 +40,25 @@
               <div class="text-caption text-grey mb-1">Difficulty</div>
               <v-rating v-model="difficulty" density="compact" color="red-lighten-1" half-increments hover />
             </v-col>
-            <v-col cols="12">
-              <v-textarea v-model="description" label="Short Description" variant="outlined" rows="2" auto-grow />
+
+            <v-col cols="12" md="4" class="py-0">
+              <v-switch
+                v-model="isPublic"
+                color="primary"
+                label="Make Recipe Public"
+                hide-details
+                inset
+              >
+                <template #prepend>
+                  <v-icon :icon="isPublic ? 'mdi-earth' : 'mdi-lock'" class="mr-2" />
+                </template>
+              </v-switch>
+              <div class="text-caption text-medium-emphasis ml-10 mt-n2 mb-4">
+                {{ isPublic ? 'Everyone can view this recipe' : 'Only you can view this recipe' }}
+              </div>
             </v-col>
-            <v-col cols="12">
+
+            <v-col cols="12" md="8">
               <v-combobox
                 v-model="tags"
                 :items="existingTags"
@@ -57,6 +72,10 @@
                   <v-chip v-bind="props" :text="capitalise(item.value)" :color="tagColor(item.value.toLowerCase())" variant="flat" />
                 </template>
               </v-combobox>
+            </v-col>
+
+            <v-col cols="12">
+              <v-textarea v-model="description" label="Short Description" variant="outlined" rows="2" auto-grow />
             </v-col>
           </v-row>
         </v-card-text>
@@ -91,12 +110,12 @@
               <div v-for="(tool, tIdx) in section.tools" :key="tIdx" class="d-flex ga-2 mb-2">
                 <v-text-field
                   v-model="section.tools[tIdx]"
+                  :prepend-inner-icon="getToolIcon(section.tools[tIdx])"
                   label="Tool"
                   variant="solo"
                   density="compact"
                   flat
                   hide-details
-                  prepend-inner-icon="mdi-wrench"
                 />
                 <v-btn icon="mdi-plus" variant="text" size="small" @click="addSectionElement('tools', sIdx, tIdx)" />
                 <v-btn :disabled="section.tools.length < 2" icon="mdi-minus" variant="text" size="small" color="error" @click="removeSectionElement('tools', sIdx, tIdx)" />
@@ -158,6 +177,7 @@ import { computed, nextTick, onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { storeToRefs } from 'pinia';
 
+import { getToolIcon } from '@/utils';
 import {
   capitalise,
   clone,
@@ -176,6 +196,7 @@ const tags = ref([]);
 const sections = ref([]);
 const satisfaction = ref(0);
 const difficulty = ref(0);
+const isPublic = ref(false);
 
 const recipeStore = useRecipeStore();
 const { list: recipeList, loaders: recipeLoaders } = storeToRefs(recipeStore);
@@ -245,6 +266,7 @@ const createRecipe = async () => {
       difficulty: difficulty.value * 2,
       satisfaction: satisfaction.value * 2,
       times: {},
+      public: isPublic.value,
       recipe: sections.value.reduce((acc, cur) => {
         if (!cur.name) return acc;
         const section = {
