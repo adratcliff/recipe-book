@@ -58,11 +58,17 @@
                   cover
                   height="100%"
                   min-height="250"
-                  src=""
-                  class="bg-grey-lighten-2">
+                  src="FILL ME IN LATER">
                   <template #placeholder>
-                    <v-row class="fill-height ma-0" align="center" justify="center">
-                      <v-progress-circular indeterminate color="grey-lighten-5" />
+                    <v-row class="fill-height ma-0 align-center justify-center">
+                      <v-progress-circular indeterminate color="grey-lighten-1" />
+                    </v-row>
+                  </template>
+
+                  <template #error>
+                    <v-row class="fill-height ma-0 align-center justify-center flex-column">
+                      <v-icon size="48" color="grey-lighten-1">{{ getFoodTagCategoryIcon(recipe.tags) }}</v-icon>
+                      <div class="text-caption text-grey-lighten-1 mt-2">No Image Provided</div>
                     </v-row>
                   </template>
                 </v-img>
@@ -217,6 +223,7 @@ import { computed, onMounted, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { storeToRefs } from 'pinia';
 
+import { getFoodTagCategoryIcon } from '@/utils';
 import {
   capitalise,
   decimalToFraction,
