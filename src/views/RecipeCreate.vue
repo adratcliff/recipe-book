@@ -112,23 +112,64 @@
                   v-model="section.tools[tIdx]"
                   :prepend-inner-icon="getToolIcon(section.tools[tIdx])"
                   label="Tool"
+                  ref="sectionTools"
                   variant="solo"
                   density="compact"
                   flat
-                  hide-details
-                />
-                <v-btn icon="mdi-plus" variant="text" size="small" @click="addSectionElement('tools', sIdx, tIdx)" />
-                <v-btn :disabled="section.tools.length < 2" icon="mdi-minus" variant="text" size="small" color="error" @click="removeSectionElement('tools', sIdx, tIdx)" />
+                  hide-details />
+                <v-btn
+                  icon="mdi-plus"
+                  variant="text"
+                  size="small"
+                  @click="addSectionElement('tools', sIdx, tIdx)" />
+                <v-btn
+                  :disabled="section.tools.length < 2"
+                  icon="mdi-minus"
+                  variant="text"
+                  size="small"
+                  color="error"
+                  @click="removeSectionElement('tools', sIdx, tIdx)" />
               </div>
 
               <v-divider class="my-4" />
 
               <div v-for="(ing, iIdx) in section.ingredients" :key="iIdx" class="d-flex ga-1 mb-2 align-center">
-                <v-text-field v-model="ing.quantity" label="Qty" variant="solo" density="compact" flat hide-details style="width: 60px" />
-                <v-text-field v-model="ing.unit" label="Unit" variant="solo" density="compact" flat hide-details style="width: 80px" />
-                <v-text-field v-model="ing.item" label="Item" variant="solo" density="compact" flat hide-details />
-                <v-btn icon="mdi-plus" variant="text" size="small" @click="addSectionElement('ingredients', sIdx, iIdx)" />
-                <v-btn :disabled="section.ingredients.length < 2" icon="mdi-minus" variant="text" size="small" color="error" @click="removeSectionElement('ingredients', sIdx, iIdx)" />
+                <v-text-field
+                  v-model="ing.quantity"
+                  ref="sectionIngredientQuantities"
+                  label="Qty"
+                  variant="solo"
+                  density="compact"
+                  flat
+                  hide-details
+                  style="width: 60px" />
+                <v-text-field
+                  v-model="ing.unit"
+                  label="Unit"
+                  variant="solo"
+                  density="compact"
+                  flat
+                  hide-details
+                  style="width: 80px" />
+                <v-text-field
+                  v-model="ing.item"
+                  label="Item"
+                  variant="solo"
+                  density="compact"
+                  flat
+                  hide-details />
+                <v-btn
+                  icon="mdi-plus"
+                  variant="text"
+                  size="small"
+                  @click="addSectionElement('ingredients', sIdx, iIdx)" />
+                <v-btn
+                  :disabled="section.ingredients.length < 2"
+                  icon="mdi-minus"
+                  variant="text"
+                  size="small"
+                  color="error"
+                  @click="removeSectionElement('ingredients', sIdx, iIdx)" />
               </div>
             </v-col>
 
@@ -138,16 +179,26 @@
                 <v-avatar color="primary" size="24" class="mt-3 text-caption">{{ instIdx + 1 }}</v-avatar>
                 <v-textarea
                   v-model="section.instructions[instIdx]"
+                  ref="sectionInstructions"
                   variant="outlined"
                   density="compact"
                   rows="1"
                   auto-grow
                   hide-details
-                  placeholder="What's the next step?"
-                />
+                  placeholder="What's the next step?" />
                 <div class="d-flex flex-column">
-                  <v-btn icon="mdi-plus" variant="text" size="small" @click="addSectionElement('instructions', sIdx, instIdx)" />
-                  <v-btn :disabled="section.instructions.length < 2" icon="mdi-minus" variant="text" size="small" color="error" @click="removeSectionElement('instructions', sIdx, instIdx)" />
+                  <v-btn
+                    icon="mdi-plus"
+                    variant="text"
+                    size="small"
+                    @click="addSectionElement('instructions', sIdx, instIdx)" />
+                  <v-btn
+                    :disabled="section.instructions.length < 2"
+                    icon="mdi-minus"
+                    variant="text"
+                    size="small"
+                    color="error"
+                    @click="removeSectionElement('instructions', sIdx, instIdx)" />
                 </div>
               </div>
             </v-col>
@@ -157,17 +208,13 @@
 
       <v-btn
         block
-        variant="dashed"
-        border
+        variant="outlined"
         height="80"
         color="primary"
-        class="rounded-xl mb-12"
+        class="rounded-xl mb-12 dashed-border"
         prepend-icon="mdi-plus-circle"
-        @click="addSection"
-      >
-        Add Another Section (e.g. Frosting, Garnish)
-      </v-btn>
-
+        text="Add Another Section (e.g. Frosting, Garnish)"
+        @click="addSection" />
     </v-form>
   </v-container>
 </template>
@@ -307,8 +354,11 @@ onMounted(async () => {
   max-width: 1000px;
   margin: 0 auto;
 }
-/* Creating a "dashed" button style for the Add Section button */
-.v-btn--variant-dashed {
-  border: 2px dashed currentColor !important;
+
+.dashed-border {
+  border-style: dashed !important;
+  border-width: 2px !important;
+  /* Adjust background if you want a subtle tint */
+  background-color: rgba(var(--v-theme-primary), 0.02);
 }
 </style>
