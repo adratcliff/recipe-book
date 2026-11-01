@@ -13,7 +13,8 @@
           rounded="lg" />
       </v-col>
       <v-spacer />
-      <v-col cols="auto">
+      <v-col cols="auto" class="d-flex align-center ga-3">
+        <view-toggle v-model="view" />
         <v-btn
           v-if="user.id"
           color="primary"
@@ -59,7 +60,7 @@
       </v-col>
     </v-row>
 
-    <v-row v-if="recipeLoaders.list">
+    <v-row v-if="recipeLoaders.list && view === 'cards'">
       <v-col
         v-for="n in 12"
         :key="n"
@@ -68,7 +69,9 @@
       </v-col>
     </v-row>
 
-    <v-row v-else-if="recipeList.length">
+    <v-skeleton-loader v-else-if="recipeLoaders.list" type="table-tbody" class="bg-transparent" />
+
+    <v-row v-else-if="recipeList.length && view === 'cards'">
       <v-col
         v-for="recipe in filteredRecipes"
         :key="recipe.id"
@@ -142,6 +145,59 @@
       </v-col>
     </v-row>
 
+    <v-table v-else-if="recipeList.length" hover class="bg-transparent">
+      <thead>
+        <tr>
+          <th>Recipe</th>
+          <th>Tags</th>
+          <th class="d-none d-sm-table-cell">Rating</th>
+          <th class="chevron-cell" />
+        </tr>
+      </thead>
+      <tbody>
+        <tr
+          v-for="recipe in filteredRecipes"
+          :key="recipe.id"
+          class="cursor-pointer"
+          @click="router.push(`/recipes/${recipe.id}`)">
+          <td>
+            <div class="d-flex align-center ga-3">
+              <v-icon :icon="getFoodTagCategoryIcon(recipe.tags)" size="20" class="text-medium-emphasis" />
+              <router-link :to="`/recipes/${recipe.id}`" class="font-weight-medium text-high-emphasis text-decoration-none" @click.stop>
+                {{ recipe.name }}
+              </router-link>
+            </div>
+          </td>
+          <td>
+            <div class="d-flex flex-wrap align-center ga-1 py-2">
+              <v-chip
+                v-for="(tag, idx) in recipe.tags.slice(0, 3)"
+                :key="idx"
+                :color="tagColor(tag)"
+                :text="capitalise(tag)"
+                size="x-small"
+                variant="flat"
+                label />
+              <span v-if="recipe.tags.length > 3" class="text-caption text-grey ml-1">
+                +{{ recipe.tags.length - 3 }}
+              </span>
+            </div>
+          </td>
+          <td class="d-none d-sm-table-cell">
+            <v-rating
+              :model-value="recipe.satisfaction / 2"
+              readonly
+              density="compact"
+              size="x-small"
+              active-color="amber" />
+          </td>
+          <td class="chevron-cell text-end">
+            <v-icon icon="mdi-chevron-right" class="text-medium-emphasis" />
+          </td>
+        </tr>
+      </tbody>
+    </v-table>
+
     <v-row v-else justify="center" class="mt-12">
       <v-col cols="auto" class="text-center">
         <v-icon icon="mdi-silverware-clean" size="100" color="grey-lighten-2" />
@@ -152,12 +208,14 @@
   </v-container>
 </template>
 <script setup>
-import { computed, onMounted, ref } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
+import { useRouter } from 'vue-router';
 import { storeToRefs } from 'pinia';
 
 import { getFoodTagCategoryIcon } from '@/utils';
 import { capitalise, tagColor } from 'shared/utils';
 import { useUserStore } from 'shared/stores';
+import { ViewToggle } from 'shared/components';
 
 import { useRecipeStore } from '../stores';
 
@@ -167,6 +225,11 @@ const { self: user } = storeToRefs(userStore);
 
 const recipeStore = useRecipeStore();
 const { list: recipeList, loaders: recipeLoaders } = storeToRefs(recipeStore);
+
+const router = useRouter();
+
+const view = ref(localStorage.getItem('adratcliff-recipeview') || 'cards');
+watch(view, value => localStorage.setItem('adratcliff-recipeview', value));
 
 const search = ref('');
 const selectedTags = ref([]);
@@ -200,6 +263,9 @@ onMounted(async () => {
 }
 .recipe-card:hover {
   transform: translateY(-4px);
+}
+.chevron-cell {
+  width: 48px;
 }
 .opacity-80 {
   opacity: 0.85;
